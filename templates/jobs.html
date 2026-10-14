@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Job Opportunities - Student Skill & Placement Tracker{% endblock %}
+
+{% block content %}
+<div class="app-wrapper">
+    {% include "student_sidebar.html" %}
+
+    <div class="main-content">
+        <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+            <div>
+                <h3 class="fw-bold text-dark mb-1">Campus Placement Drives & Jobs</h3>
+                <p class="text-muted small mb-0">Discover verified recruitment drives, internships, and full-time software positions.</p>
+            </div>
+            <a href="{{ url_for('applications') }}" class="btn btn-outline-primary btn-sm">
+                <i class="fa-solid fa-list-check me-1"></i> My Applications
+            </a>
+        </div>
+
+        <!-- Search and Filter Bar -->
+        <div class="card card-custom p-3 mb-4">
+            <form method="GET" action="{{ url_for('jobs') }}" class="row g-2 align-items-center">
+                <div class="col-md-7">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                        <input type="text" class="form-control border-start-0" name="search" value="{{ search_query or '' }}" placeholder="Search by role, company, location, or skill (e.g. Python)...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" name="type">
+                        <option value="">All Job Types</option>
+                        <option value="Full-Time" {% if job_type == 'Full-Time' %}selected{% endif %}>Full-Time</option>
+                        <option value="Internship" {% if job_type == 'Internship' %}selected{% endif %}>Internship</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-fill">Filter</button>
+                    {% if search_query or job_type %}
+                        <a href="{{ url_for('jobs') }}" class="btn btn-light border" title="Clear Filters"><i class="fa-solid fa-xmark"></i></a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+
+        <!-- Jobs Listing Grid -->
+        <div class="row g-4">
+            {% if jobs %}
+                {% for job in jobs %}
+                <div class="col-lg-6">
+                    <div class="card card-custom h-100 p-4 d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <span class="badge bg-light text-dark border mb-1">{{ job.job_type }}</span>
+                                <h5 class="fw-bold text-dark mb-0">{{ job.title }}</h5>
+                                <h6 class="text-primary fw-semibold mt-1 mb-0">
+                                    <i class="fa-solid fa-building me-1"></i> {{ job.company }}
+                                </h6>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle py-1 px-2">
+                                    <i class="fa-regular fa-calendar-xmark me-1"></i> Deadline: {{ job.deadline }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-3 text-muted small my-2 py-2 border-top border-bottom">
+                            <span><i class="fa-solid fa-location-dot text-danger me-1"></i> {{ job.location }}</span>
+                            <span><i class="fa-solid fa-money-bill-wave text-success me-1"></i> {{ job.salary }}</span>
+                        </div>
+
+                        <p class="text-muted small mb-3 flex-grow-1">
+                            {{ job.description }}
+                        </p>
+
+                        <!-- Required Skills Tags -->
+                        <div class="mb-3">
+                            <small class="text-muted fw-semibold d-block mb-1">Required Skills:</small>
+                            {% for skill in job.required_skills.split(',') %}
+                                <span class="skill-tag">{{ skill.strip() }}</span>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Card Action Footer -->
+                        <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-auto">
+                            <!-- Skill Gap Analyzer Button -->
+                            <a href="{{ url_for('skill_gap') }}?job_id={{ job.id }}" class="btn btn-outline-secondary btn-sm">
+                                <i class="fa-solid fa-chart-pie me-1 text-primary"></i> Check Skill Gap
+                            </a>
+
+                            <!-- Apply Button / Status Indicator -->
+                            {% if job.id in applied_job_map %}
+                                <span class="badge-status {{ applied_job_map[job.id]|lower }} px-3 py-2">
+                                    <i class="fa-solid fa-circle-check me-1"></i> {{ applied_job_map[job.id] }}
+                                </span>
+                            {% else %}
+                                <form method="POST" action="{{ url_for('apply_job', job_id=job.id) }}" onsubmit="return confirm('Confirm application for {{ job.title }} at {{ job.company }}?');">
+                                    <button type="submit" class="btn btn-primary btn-sm px-3">
+                                        <i class="fa-solid fa-paper-plane me-1"></i> Apply Now
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="card card-custom p-5 text-center">
+                        <i class="fa-solid fa-briefcase text-muted fs-1 mb-3"></i>
+                        <h5 class="fw-bold text-dark">No job openings found</h5>
+                        <p class="text-muted small mb-3">Try clearing filters or search queries.</p>
+                        <div>
+                            <a href="{{ url_for('jobs') }}" class="btn btn-primary btn-sm">Reset Search</a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

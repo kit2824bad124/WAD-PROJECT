@@ -1,0 +1,56 @@
+<!-- Admin Portal Sidebar -->
+<aside class="sidebar">
+    <div class="sidebar-sticky">
+        <div class="px-3 pb-3 mb-2 border-bottom text-center">
+            <div class="avatar-profile mx-auto d-flex align-items-center justify-content-center bg-secondary-subtle text-secondary mb-2" style="width: 64px; height: 64px; font-size: 1.5rem;">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h6 class="fw-bold mb-0 text-dark">{{ session.get('name') }}</h6>
+            <span class="badge bg-secondary-subtle text-secondary border small mt-1">Placement Officer</span>
+        </div>
+
+        <div class="sidebar-heading">Admin Management</div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{{ url_for('admin_dashboard') }}" class="sidebar-link {% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
+                    <i class="fa-solid fa-gauge-high"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin_students') }}" class="sidebar-link {% if request.endpoint in ['admin_students', 'admin_student_detail'] %}active{% endif %}">
+                    <i class="fa-solid fa-user-graduate"></i>
+                    <span>Students</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin_jobs') }}" class="sidebar-link {% if request.endpoint == 'admin_jobs' %}active{% endif %}">
+                    <i class="fa-solid fa-briefcase"></i>
+                    <span>Jobs</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin_applications') }}" class="sidebar-link {% if request.endpoint == 'admin_applications' %}active{% endif %}">
+                    <i class="fa-solid fa-file-signature"></i>
+                    <span>Applications</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin_dashboard') }}#placement-stats" class="sidebar-link">
+                    <i class="fa-solid fa-chart-simple"></i>
+                    <span>Placement Statistics</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-heading mt-4">Session</div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{{ url_for('logout') }}" class="sidebar-link text-danger">
+                    <i class="fa-solid fa-arrow-right-from-bracket text-danger"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</aside>

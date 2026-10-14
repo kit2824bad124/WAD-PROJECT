@@ -1,0 +1,80 @@
+<!-- Student Portal Sidebar -->
+<aside class="sidebar">
+    <div class="sidebar-sticky">
+        <div class="px-3 pb-3 mb-2 border-bottom text-center">
+            <div class="avatar-profile mx-auto d-flex align-items-center justify-content-center bg-primary-subtle text-primary mb-2" style="width: 64px; height: 64px; font-size: 1.5rem;">
+                <i class="fa-solid fa-user-graduate"></i>
+            </div>
+            <h6 class="fw-bold mb-0 text-dark">{{ session.get('name') }}</h6>
+            <span class="badge bg-light text-muted border small mt-1">Student Portal</span>
+        </div>
+
+        <div class="sidebar-heading">Navigation</div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{{ url_for('student_dashboard') }}" class="sidebar-link {% if request.endpoint == 'student_dashboard' %}active{% endif %}">
+                    <i class="fa-solid fa-gauge-high"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('profile') }}" class="sidebar-link {% if request.endpoint == 'profile' %}active{% endif %}">
+                    <i class="fa-regular fa-id-badge"></i>
+                    <span>My Profile</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('skills') }}" class="sidebar-link {% if request.endpoint == 'skills' %}active{% endif %}">
+                    <i class="fa-solid fa-code"></i>
+                    <span>My Skills</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('certifications') }}" class="sidebar-link {% if request.endpoint == 'certifications' %}active{% endif %}">
+                    <i class="fa-solid fa-award"></i>
+                    <span>Certifications</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('projects') }}" class="sidebar-link {% if request.endpoint == 'projects' %}active{% endif %}">
+                    <i class="fa-solid fa-laptop-code"></i>
+                    <span>Projects</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('jobs') }}" class="sidebar-link {% if request.endpoint == 'jobs' %}active{% endif %}">
+                    <i class="fa-solid fa-briefcase"></i>
+                    <span>Job Opportunities</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('applications') }}" class="sidebar-link {% if request.endpoint == 'applications' %}active{% endif %}">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>My Applications</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('skill_gap') }}" class="sidebar-link {% if request.endpoint == 'skill_gap' %}active{% endif %}">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Skill Gap Analyzer</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('resume') }}" class="sidebar-link {% if request.endpoint == 'resume' %}active{% endif %}">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    <span>Resume</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-heading mt-4">Session</div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{{ url_for('logout') }}" class="sidebar-link text-danger">
+                    <i class="fa-solid fa-arrow-right-from-bracket text-danger"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</aside>

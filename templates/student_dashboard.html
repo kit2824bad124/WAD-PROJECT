@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Student Skill & Placement Tracker{% endblock %}
+
+{% block content %}
+<div class="app-wrapper">
+    <!-- Student Sidebar -->
+    {% include "student_sidebar.html" %}
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Welcome Banner -->
+        <div class="card card-custom p-4 mb-4 border-0" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: #ffffff;">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <span class="badge bg-white text-primary fw-bold px-3 py-1 mb-2 rounded-pill">Welcome to SkillTrack</span>
+                    <h2 class="fw-bold mb-1">Hello, {{ session.get('name') }}! 👋</h2>
+                    <p class="mb-0 text-white-50">
+                        {{ profile.department or 'Department Unassigned' }} &bull; {{ profile.year or 'Year not set' }}
+                        {% if profile.cgpa %} &bull; <strong>CGPA: {{ profile.cgpa }}</strong>{% endif %}
+                    </p>
+                </div>
+                <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                    <a href="{{ url_for('jobs') }}" class="btn btn-light px-3 py-2 fw-semibold me-2">
+                        <i class="fa-solid fa-briefcase me-1"></i> Browse Jobs
+                    </a>
+                    <a href="{{ url_for('skill_gap') }}" class="btn btn-outline-light px-3 py-2 fw-semibold">
+                        <i class="fa-solid fa-chart-pie me-1"></i> Check Skill Gap
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Completion Card -->
+        <div class="card card-custom p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                    <h6 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-shield-halved text-primary me-2"></i> Profile Completion Status</h6>
+                    <small class="text-muted">A complete profile increases recruiter visibility by 3x.</small>
+                </div>
+                <span class="fw-bold fs-5 text-primary">{{ completion_pct }}%</span>
+            </div>
+            <div class="progress" style="height: 10px; border-radius: 6px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: {{ completion_pct }}%;" aria-valuenow="{{ completion_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            {% if completion_pct < 100 %}
+            <div class="mt-2 text-end">
+                <a href="{{ url_for('profile') }}" class="small text-decoration-none fw-semibold">Complete your profile <i class="fa-solid fa-arrow-right ms-1"></i></a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- 5 Key KPI Metric Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-sm-6 col-xl">
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-label">Skills</div>
+                        <div class="stat-number text-primary">{{ skills_count }}</div>
+                    </div>
+                    <div class="stat-icon primary">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl">
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-label">Certifications</div>
+                        <div class="stat-number text-secondary">{{ certs_count }}</div>
+                    </div>
+                    <div class="stat-icon secondary">
+                        <i class="fa-solid fa-award"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl">
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-label">Projects</div>
+                        <div class="stat-number text-info">{{ projects_count }}</div>
+                    </div>
+                    <div class="stat-icon info">
+                        <i class="fa-solid fa-laptop-code"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl">
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-label">Applications</div>
+                        <div class="stat-number text-warning">{{ apps_count }}</div>
+                    </div>
+                    <div class="stat-icon warning">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl">
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-label">Selected Jobs</div>
+                        <div class="stat-number text-success">{{ selected_count }}</div>
+                    </div>
+                    <div class="stat-icon success">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Two Column Section: Recent Applications & Recommended Jobs -->
+        <div class="row g-4">
+            <!-- Left: Recent Applications -->
+            <div class="col-lg-7">
+                <div class="card card-custom h-100">
+                    <div class="card-header-custom">
+                        <h6 class="fw-bold mb-0 text-dark">
+                            <i class="fa-solid fa-clock-rotate-left text-primary me-2"></i> Recent Job Applications
+                        </h6>
+                        <a href="{{ url_for('applications') }}" class="small fw-semibold text-primary">View All</a>
+                    </div>
+                    <div class="card-body-custom p-0">
+                        {% if recent_apps %}
+                        <div class="table-responsive">
+                            <table class="table table-custom mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Company & Role</th>
+                                        <th>Applied On</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for app in recent_apps %}
+                                    <tr>
+                                        <td>
+                                            <div class="fw-bold text-dark">{{ app.job_title }}</div>
+                                            <small class="text-muted">{{ app.company }} &bull; {{ app.location }}</small>
+                                        </td>
+                                        <td class="text-muted small">
+                                            {{ app.applied_at[:10] }}
+                                        </td>
+                                        <td>
+                                            <span class="badge-status {{ app.status|lower }}">
+                                                <i class="fa-solid fa-circle" style="font-size: 0.5rem;"></i> {{ app.status }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <i class="fa-solid fa-file-circle-question text-muted fs-1 mb-2"></i>
+                            <p class="text-muted mb-2">You haven't applied to any job drives yet.</p>
+                            <a href="{{ url_for('jobs') }}" class="btn btn-primary btn-sm">Explore Openings</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Recommended Jobs & Resume status -->
+            <div class="col-lg-5">
+                <!-- Resume Card Snapshot -->
+                <div class="card card-custom p-4 mb-4">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h6 class="fw-bold mb-0 text-dark">
+                            <i class="fa-solid fa-file-pdf text-danger me-2"></i> Resume Status
+                        </h6>
+                        {% if resume %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle">Uploaded</span>
+                        {% else %}
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Missing</span>
+                        {% endif %}
+                    </div>
+                    {% if resume %}
+                        <p class="small text-muted mb-2">Active file: <strong>{{ resume.original_filename }}</strong></p>
+                        <div class="d-flex gap-2">
+                            <a href="{{ url_for('view_resume_file', filename=resume.filename) }}" target="_blank" class="btn btn-outline-primary btn-sm flex-fill">
+                                <i class="fa-solid fa-eye me-1"></i> View Resume
+                            </a>
+                            <a href="{{ url_for('resume') }}" class="btn btn-light btn-sm flex-fill">
+                                <i class="fa-solid fa-arrows-rotate me-1"></i> Manage
+                            </a>
+                        </div>
+                    {% else %}
+                        <p class="small text-muted mb-3">You haven't uploaded a PDF resume yet. Campus recruiters require a verified resume.</p>
+                        <a href="{{ url_for('resume') }}" class="btn btn-primary btn-sm w-100">
+                            <i class="fa-solid fa-upload me-1"></i> Upload Resume (PDF)
+                        </a>
+                    {% endif %}
+                </div>
+
+                <!-- Recommended Jobs -->
+                <div class="card card-custom">
+                    <div class="card-header-custom">
+                        <h6 class="fw-bold mb-0 text-dark">
+                            <i class="fa-solid fa-wand-magic-sparkles text-warning me-2"></i> Recommended Drives
+                        </h6>
+                        <a href="{{ url_for('jobs') }}" class="small fw-semibold text-primary">All Jobs</a>
+                    </div>
+                    <div class="card-body-custom p-3">
+                        {% for job in recommended_jobs %}
+                        <div class="p-3 mb-2 rounded border bg-light">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="fw-bold mb-0 text-dark">{{ job.title }}</h6>
+                                    <small class="text-primary fw-semibold">{{ job.company }}</small>
+                                </div>
+                                <span class="badge bg-white text-muted border small">{{ job.job_type }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
+                                <small class="text-muted"><i class="fa-solid fa-money-bill-wave me-1"></i> {{ job.salary }}</small>
+                                <a href="{{ url_for('skill_gap') }}?job_id={{ job.id }}" class="btn btn-outline-primary btn-sm py-0 px-2" style="font-size: 0.78rem;">
+                                    Analyze Gap
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}My Skills - Student Skill & Placement Tracker{% endblock %}
+
+{% block content %}
+<div class="app-wrapper">
+    {% include "student_sidebar.html" %}
+
+    <div class="main-content">
+        <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+            <div>
+                <h3 class="fw-bold text-dark mb-1">My Technical Skills</h3>
+                <p class="text-muted small mb-0">Showcase your technical competencies and proficiency levels to recruiters.</p>
+            </div>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSkillModal">
+                <i class="fa-solid fa-plus me-1"></i> Add New Skill
+            </button>
+        </div>
+
+        <!-- Quick Add Suggested Skills Pill Bar -->
+        <div class="card card-custom p-3 mb-4 bg-light">
+            <small class="fw-bold text-muted text-uppercase d-block mb-2">
+                <i class="fa-solid fa-lightbulb text-warning me-1"></i> Popular College & Placement Skills (Click to select)
+            </small>
+            <div class="d-flex flex-wrap gap-1">
+                {% for m in master_skills %}
+                    <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2 border bg-white" onclick="quickSelectSkill('{{ m.name }}')">
+                        + {{ m.name }}
+                    </button>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Student Skills Grid -->
+        <div class="row g-3">
+            {% if student_skills %}
+                {% for skill in student_skills %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card card-custom h-100 p-3">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <h5 class="fw-bold text-dark mb-0">{{ skill.skill_name }}</h5>
+                            <span class="badge-proficiency {{ skill.proficiency|lower }}">
+                                {{ skill.proficiency }}
+                            </span>
+                        </div>
+
+                        <!-- Visual progress indicator based on proficiency -->
+                        <div class="progress mb-3" style="height: 6px;">
+                            {% if skill.proficiency == 'Beginner' %}
+                                <div class="progress-bar bg-warning" style="width: 35%;"></div>
+                            {% elif skill.proficiency == 'Intermediate' %}
+                                <div class="progress-bar bg-primary" style="width: 70%;"></div>
+                            {% else %}
+                                <div class="progress-bar bg-success" style="width: 100%;"></div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top">
+                            <!-- Edit Proficiency Modal Trigger -->
+                            <button class="btn btn-light btn-sm text-primary py-1 px-2 border" data-bs-toggle="modal" data-bs-target="#editSkillModal{{ skill.id }}">
+                                <i class="fa-solid fa-pen-to-square me-1"></i> Edit
+                            </button>
+
+                            <!-- Delete Form -->
+                            <form method="POST" action="{{ url_for('delete_skill', skill_id=skill.id) }}" onsubmit="return confirm('Remove skill {{ skill.skill_name }}?');">
+                                <button type="submit" class="btn btn-light btn-sm text-danger py-1 px-2 border">
+                                    <i class="fa-solid fa-trash me-1"></i> Remove
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edit Skill Modal -->
+                <div class="modal fade" id="editSkillModal{{ skill.id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content border-0 shadow">
+                            <form method="POST" action="{{ url_for('edit_skill', skill_id=skill.id) }}">
+                                <div class="modal-header">
+                                    <h5 class="modal-title fw-bold">Update Skill Proficiency: {{ skill.skill_name }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <label class="form-label fw-semibold small">Proficiency Level</label>
+                                    <select class="form-select" name="proficiency" required>
+                                        <option value="Beginner" {% if skill.proficiency == 'Beginner' %}selected{% endif %}>Beginner - Basic concepts & syntax</option>
+                                        <option value="Intermediate" {% if skill.proficiency == 'Intermediate' %}selected{% endif %}>Intermediate - Built small projects & scripts</option>
+                                        <option value="Advanced" {% if skill.proficiency == 'Advanced' %}selected{% endif %}>Advanced - Strong problem solver, production-ready</option>
+                                    </select>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="card card-custom p-5 text-center">
+                        <i class="fa-solid fa-code text-muted fs-1 mb-3"></i>
+                        <h5 class="fw-bold text-dark">No skills added yet</h5>
+                        <p class="text-muted small mb-3">Start adding your programming languages and technical skills to get accurate job matches.</p>
+                        <div>
+                            <button class="btn btn-primary btn-sm px-3" data-bs-toggle="modal" data-bs-target="#addSkillModal">
+                                <i class="fa-solid fa-plus me-1"></i> Add Your First Skill
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Add Skill Modal -->
+<div class="modal fade" id="addSkillModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <form method="POST" action="{{ url_for('add_skill') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Add New Technical Skill</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="skill_name" class="form-label fw-semibold small">Skill Name *</label>
+                        <input type="text" class="form-control" id="skill_name" name="skill_name" placeholder="e.g. Python, React, SQL, Machine Learning" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="proficiency" class="form-label fw-semibold small">Proficiency Level *</label>
+                        <select class="form-select" id="proficiency" name="proficiency" required>
+                            <option value="Beginner">Beginner - Basic syntax & fundamentals</option>
+                            <option value="Intermediate" selected>Intermediate - Hands-on experience with projects</option>
+                            <option value="Advanced">Advanced - Deep expertise & architectural mastery</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Skill</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function quickSelectSkill(name) {
+    const input = document.getElementById('skill_name');
+    if (input) {
+        input.value = name;
+        const modal = new bootstrap.Modal(document.getElementById('addSkillModal'));
+        modal.show();
+    }
+}
+</script>
+{% endblock %}

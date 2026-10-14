@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}My Applications - Student Skill & Placement Tracker{% endblock %}
+
+{% block content %}
+<div class="app-wrapper">
+    {% include "student_sidebar.html" %}
+
+    <div class="main-content">
+        <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+            <div>
+                <h3 class="fw-bold text-dark mb-1">My Applications</h3>
+                <p class="text-muted small mb-0">Track all campus placement and internship submissions in real-time.</p>
+            </div>
+            <a href="{{ url_for('jobs') }}" class="btn btn-primary btn-sm">
+                <i class="fa-solid fa-plus me-1"></i> Apply for More Jobs
+            </a>
+        </div>
+
+        <div class="card card-custom">
+            <div class="card-body-custom p-0">
+                {% if applications %}
+                <div class="table-responsive">
+                    <table class="table table-custom mb-0">
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Job Role & Type</th>
+                                <th>Location & Compensation</th>
+                                <th>Applied Date</th>
+                                <th>Current Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for app in applications %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="stat-icon primary me-2" style="width: 38px; height: 38px; font-size: 1rem;">
+                                            <i class="fa-solid fa-building"></i>
+                                        </div>
+                                        <div class="fw-bold text-dark">{{ app.company }}</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold text-dark">{{ app.job_title }}</div>
+                                    <span class="badge bg-light text-muted border small">{{ app.job_type }}</span>
+                                </td>
+                                <td>
+                                    <div class="small text-muted">{{ app.location }}</div>
+                                    <div class="small fw-semibold text-success">{{ app.salary }}</div>
+                                </td>
+                                <td>
+                                    <span class="text-muted small">
+                                        <i class="fa-regular fa-calendar me-1"></i> {{ app.applied_at[:10] }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge-status {{ app.status|lower }}">
+                                        {% if app.status == 'Applied' %}
+                                            <i class="fa-solid fa-file-circle-check"></i> Applied
+                                        {% elif app.status == 'Shortlisted' %}
+                                            <i class="fa-solid fa-user-check"></i> Shortlisted
+                                        {% elif app.status == 'Interview' %}
+                                            <i class="fa-solid fa-user-tie"></i> Interview
+                                        {% elif app.status == 'Selected' %}
+                                            <i class="fa-solid fa-award"></i> Selected
+                                        {% elif app.status == 'Rejected' %}
+                                            <i class="fa-solid fa-circle-xmark"></i> Rejected
+                                        {% endif %}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fa-solid fa-paper-plane text-muted fs-1 mb-3"></i>
+                    <h5 class="fw-bold text-dark">No job applications submitted yet</h5>
+                    <p class="text-muted small mb-3">Explore available placement drives and submit your first application.</p>
+                    <a href="{{ url_for('jobs') }}" class="btn btn-primary btn-sm px-3">
+                        <i class="fa-solid fa-magnifying-glass me-1"></i> View Available Jobs
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Skill Gap Analyzer - Student Skill & Placement Tracker{% endblock %}
+
+{% block content %}
+<div class="app-wrapper">
+    {% include "student_sidebar.html" %}
+
+    <div class="main-content">
+        <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+            <div>
+                <h3 class="fw-bold text-dark mb-1">Skill Gap Analyzer</h3>
+                <p class="text-muted small mb-0">Evaluate your technical competencies against real placement requirements.</p>
+            </div>
+            <a href="{{ url_for('skills') }}" class="btn btn-outline-primary btn-sm">
+                <i class="fa-solid fa-code me-1"></i> Update My Skills
+            </a>
+        </div>
+
+        <!-- Job Selection Selector Card -->
+        <div class="card card-custom p-4 mb-4">
+            <label for="gap-job-selector" class="form-label fw-bold text-dark mb-2">
+                <i class="fa-solid fa-crosshairs text-primary me-1"></i> Select a Placement Drive to Analyze:
+            </label>
+            <div class="row g-2 align-items-center">
+                <div class="col-md-9">
+                    <select class="form-select form-select-lg" id="gap-job-selector">
+                        <option value="">-- Choose a Job Opportunity --</option>
+                        {% for job in jobs %}
+                            <option value="{{ job.id }}" {% if selected_job_id == job.id %}selected{% endif %}>
+                                {{ job.title }} @ {{ job.company }} (Required: {{ job.required_skills }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <span class="text-muted small d-block">
+                        <i class="fa-solid fa-user-check text-success me-1"></i> Your skills: <strong>{{ student_skills|length }}</strong> recorded
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Placeholder when no job selected -->
+        <div id="gap-placeholder" class="card card-custom p-5 text-center {% if selected_job_id %}d-none{% endif %}">
+            <div class="avatar-profile mx-auto d-flex align-items-center justify-content-center bg-primary-subtle text-primary mb-3" style="width: 80px; height: 80px; font-size: 2.2rem;">
+                <i class="fa-solid fa-chart-pie"></i>
+            </div>
+            <h5 class="fw-bold text-dark">Select a Job Opportunity</h5>
+            <p class="text-muted small mb-0 max-w-500 mx-auto">
+                Choose any campus drive from the dropdown above to instantly compute your skill match percentage, view matched competencies, see missing requirements, and receive custom improvement suggestions.
+            </p>
+        </div>
+
+        <!-- Loading spinner -->
+        <div id="gap-loading-spinner" class="text-center py-5 d-none">
+            <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                <span class="visually-hidden">Calculating skill gap...</span>
+            </div>
+            <p class="text-muted mt-2 small">Analyzing skill matrices...</p>
+        </div>
+
+        <!-- Dynamic Results Container -->
+        <div id="skill-gap-result" class="card card-custom p-4 mb-4 d-none">
+            <!-- Header with Job Title -->
+            <div class="border-bottom pb-3 mb-4 d-flex flex-wrap justify-content-between align-items-center">
+                <div>
+                    <span class="badge bg-primary-subtle text-primary mb-1">Target Role Analysis</span>
+                    <h4 class="fw-bold text-dark mb-0" id="gap-job-title">Job Title</h4>
+                    <p class="text-muted small mb-0" id="gap-job-company">Company</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('jobs') }}" class="btn btn-primary btn-sm px-3 mt-2 mt-md-0" id="gap-apply-btn">
+                        <i class="fa-solid fa-paper-plane me-1"></i> Proceed to Apply
+                    </a>
+                </div>
+            </div>
+
+            <!-- Score & Skills Columns -->
+            <div class="row g-4 align-items-center">
+                <!-- Match Score Visual -->
+                <div class="col-md-4 text-center border-end-md">
+                    <div id="gap-score-circle" class="match-score-circle match-score-high">
+                        <span id="gap-percentage" class="fs-1">80%</span>
+                        <small class="text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.05em;">Skill Match</small>
+                    </div>
+                    <div class="mt-3">
+                        <h6 class="fw-bold mb-1 text-dark">Overall Compatibility</h6>
+                        <small class="text-muted">Calculated based on verified student skills.</small>
+                    </div>
+                </div>
+
+                <!-- Matched & Missing Skills Lists -->
+                <div class="col-md-8">
+                    <!-- Matched Skills -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-success mb-2 d-flex align-items-center">
+                            <i class="fa-solid fa-circle-check me-2"></i> Matched Skills (You Have These ✓)
+                        </h6>
+                        <div id="gap-matched-skills" class="d-flex flex-wrap gap-1">
+                            <!-- Injected via JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Missing Skills -->
+                    <div class="mb-3">
+                        <h6 class="fw-bold text-danger mb-2 d-flex align-items-center">
+                            <i class="fa-solid fa-circle-xmark me-2"></i> Missing Skills (Required for Role ✗)
+                        </h6>
+                        <div id="gap-missing-skills" class="d-flex flex-wrap gap-1">
+                            <!-- Injected via JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommendation Box -->
+            <div class="alert alert-info border-0 rounded-3 mt-4 mb-0 d-flex align-items-start">
+                <i class="fa-solid fa-lightbulb text-info fs-4 me-3 mt-1"></i>
+                <div>
+                    <h6 class="fw-bold mb-1">Tailored Placement Recommendation:</h6>
+                    <p class="mb-0 small" id="gap-recommendation">
+                        Recommendation details will appear here.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Current Skills Reference Card -->
+        <div class="card card-custom p-4 bg-light">
+            <h6 class="fw-bold text-dark mb-2">
+                <i class="fa-solid fa-user-tag text-primary me-2"></i> Your Current Profile Skills
+            </h6>
+            <div class="d-flex flex-wrap gap-1">
+                {% if student_skills %}
+                    {% for skill in student_skills %}
+                        <span class="skill-tag"><i class="fa-solid fa-check text-success me-1"></i> {{ skill }}</span>
+                    {% endfor %}
+                {% else %}
+                    <span class="text-muted small">No skills in your profile yet. <a href="{{ url_for('skills') }}">Add skills</a> to use the analyzer.</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}Job Management - Placement Officer{% endblock %}
+
+{% block content %}
+<div class="app-wrapper">
+    {% include "admin_sidebar.html" %}
+
+    <div class="main-content">
+        <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+            <div>
+                <h3 class="fw-bold text-dark mb-1">Campus Placement Drives</h3>
+                <p class="text-muted small mb-0">Create, edit, and manage corporate recruitment postings and applicant criteria.</p>
+            </div>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addJobModal">
+                <i class="fa-solid fa-plus me-1"></i> Post New Job Opportunity
+            </button>
+        </div>
+
+        <div class="card card-custom">
+            <div class="card-body-custom p-0">
+                <div class="table-responsive">
+                    <table class="table table-custom mb-0">
+                        <thead>
+                            <tr>
+                                <th>Role & Company</th>
+                                <th>Type & Location</th>
+                                <th>Compensation</th>
+                                <th>Required Skills</th>
+                                <th>Deadline</th>
+                                <th>Applicants</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if jobs %}
+                                {% for job in jobs %}
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold text-dark">{{ job.title }}</div>
+                                        <div class="text-primary small fw-semibold"><i class="fa-solid fa-building me-1"></i> {{ job.company }}</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border mb-1">{{ job.job_type }}</span>
+                                        <div class="small text-muted">{{ job.location }}</div>
+                                    </td>
+                                    <td>
+                                        <span class="fw-semibold text-success small">{{ job.salary }}</span>
+                                    </td>
+                                    <td style="max-width: 250px;">
+                                        {% for skill in job.required_skills.split(',')[:3] %}
+                                            <span class="skill-tag">{{ skill.strip() }}</span>
+                                        {% endfor %}
+                                        {% if job.required_skills.split(',')|length > 3 %}
+                                            <small class="text-muted">+{{ job.required_skills.split(',')|length - 3 }} more</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small class="text-muted"><i class="fa-regular fa-clock me-1"></i> {{ job.deadline }}</small>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('admin_applications') }}?job_id={{ job.id }}" class="badge bg-primary-subtle text-primary border border-primary-subtle p-2 text-decoration-none">
+                                            <i class="fa-solid fa-users me-1"></i> {{ job.applicants_count }} Candidates
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex gap-1">
+                                            <!-- Edit Modal Trigger -->
+                                            <button class="btn btn-light btn-sm text-primary border py-1 px-2" data-bs-toggle="modal" data-bs-target="#editJobModal{{ job.id }}" title="Edit Job">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </button>
+
+                                            <!-- Delete Form -->
+                                            <form method="POST" action="{{ url_for('admin_delete_job', job_id=job.id) }}" onsubmit="return confirm('Delete job posting {{ job.title }}?');">
+                                                <button type="submit" class="btn btn-light btn-sm text-danger border py-1 px-2" title="Delete Job">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- Edit Job Modal -->
+                                <div class="modal fade" id="editJobModal{{ job.id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                                        <div class="modal-content border-0 shadow">
+                                            <form method="POST" action="{{ url_for('admin_edit_job', job_id=job.id) }}">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title fw-bold">Edit Job Posting</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="row g-3 mb-3">
+                                                        <div class="col-md-6">
+                                                            <label class="form-label fw-semibold small">Job Title *</label>
+                                                            <input type="text" class="form-control" name="title" value="{{ job.title }}" required>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label fw-semibold small">Company Name *</label>
+                                                            <input type="text" class="form-control" name="company" value="{{ job.company }}" required>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row g-3 mb-3">
+                                                        <div class="col-md-4">
+                                                            <label class="form-label fw-semibold small">Location *</label>
+                                                            <input type="text" class="form-control" name="location" value="{{ job.location }}" required>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <label class="form-label fw-semibold small">Job Type *</label>
+                                                            <select class="form-select" name="job_type">
+                                                                <option value="Full-Time" {% if job.job_type == 'Full-Time' %}selected{% endif %}>Full-Time</option>
+                                                                <option value="Internship" {% if job.job_type == 'Internship' %}selected{% endif %}>Internship</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <label class="form-label fw-semibold small">Salary / Stipend *</label>
+                                                            <input type="text" class="form-control" name="salary" value="{{ job.salary }}" required>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row g-3 mb-3">
+                                                        <div class="col-md-8">
+                                                            <label class="form-label fw-semibold small">Required Skills (comma separated) *</label>
+                                                            <input type="text" class="form-control" name="required_skills" value="{{ job.required_skills }}" required>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <label class="form-label fw-semibold small">Application Deadline *</label>
+                                                            <input type="date" class="form-control" name="deadline" value="{{ job.deadline }}" required>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="mb-2">
+                                                        <label class="form-label fw-semibold small">Job Description *</label>
+                                                        <textarea class="form-control" name="description" rows="4" required>{{ job.description }}</textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="btn btn-primary">Save Job Changes</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-5 text-muted">No placement drives found.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Job Modal -->
+<div class="modal fade" id="addJobModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <form method="POST" action="{{ url_for('admin_add_job') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Post New Job Opportunity</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="new_title" class="form-label fw-semibold small">Job Title *</label>
+                            <input type="text" class="form-control" id="new_title" name="title" placeholder="e.g. Associate Software Engineer" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="new_company" class="form-label fw-semibold small">Company Name *</label>
+                            <input type="text" class="form-control" id="new_company" name="company" placeholder="e.g. Infosys, TCS, Amazon" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label for="new_location" class="form-label fw-semibold small">Location *</label>
+                            <input type="text" class="form-control" id="new_location" name="location" placeholder="e.g. Chennai / Remote" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="new_job_type" class="form-label fw-semibold small">Job Type *</label>
+                            <select class="form-select" id="new_job_type" name="job_type">
+                                <option value="Full-Time" selected>Full-Time</option>
+                                <option value="Internship">Internship</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="new_salary" class="form-label fw-semibold small">Salary / Stipend *</label>
+                            <input type="text" class="form-control" id="new_salary" name="salary" placeholder="e.g. 7.5 LPA or 25,000/mo" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-8">
+                            <label for="new_skills" class="form-label fw-semibold small">Required Skills (comma separated) *</label>
+                            <input type="text" class="form-control" id="new_skills" name="required_skills" placeholder="e.g. Python, SQL, JavaScript, React" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="new_deadline" class="form-label fw-semibold small">Application Deadline *</label>
+                            <input type="date" class="form-control" id="new_deadline" name="deadline" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label for="new_desc" class="form-label fw-semibold small">Job Description *</label>
+                        <textarea class="form-control" id="new_desc" name="description" rows="4" placeholder="Outline job responsibilities, eligibility criteria, and selection rounds..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Job Posting</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

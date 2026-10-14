@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Resume Management - Student Skill & Placement Tracker{% endblock %}
+
+{% block content %}
+<div class="app-wrapper">
+    {% include "student_sidebar.html" %}
+
+    <div class="main-content">
+        <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+            <div>
+                <h3 class="fw-bold text-dark mb-1">Resume Management</h3>
+                <p class="text-muted small mb-0">Upload and manage your official college placement resume in PDF format.</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Left: Current Resume Status Card -->
+            <div class="col-lg-6">
+                <div class="card card-custom p-4 h-100">
+                    <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
+                        <i class="fa-solid fa-file-invoice text-primary me-2"></i> Current Resume
+                    </h5>
+
+                    {% if resume %}
+                    <div class="p-4 bg-light rounded-3 border text-center mb-4">
+                        <div class="avatar-profile mx-auto d-flex align-items-center justify-content-center bg-danger-subtle text-danger mb-3" style="width: 70px; height: 70px; font-size: 2.2rem;">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-1">{{ resume.original_filename }}</h5>
+                        <p class="text-muted small mb-3">
+                            <i class="fa-regular fa-clock me-1"></i> Uploaded on: <strong>{{ resume.upload_date }}</strong>
+                        </p>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-center gap-2">
+                            <!-- View Button -->
+                            <a href="{{ url_for('view_resume_file', filename=resume.filename) }}" target="_blank" class="btn btn-primary btn-sm px-3">
+                                <i class="fa-solid fa-arrow-up-right-from-square me-1"></i> View Resume
+                            </a>
+
+                            <!-- Delete Button -->
+                            <form method="POST" action="{{ url_for('delete_resume') }}" onsubmit="return confirm('Are you sure you want to remove your resume?');">
+                                <button type="submit" class="btn btn-light btn-sm text-danger border px-3">
+                                    <i class="fa-solid fa-trash me-1"></i> Delete
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-success border-0 small mb-0 d-flex align-items-center">
+                        <i class="fa-solid fa-circle-check fs-5 me-2"></i>
+                        <div>Your resume is active and will be visible to placement officers reviewing your applications.</div>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <div class="avatar-profile mx-auto d-flex align-items-center justify-content-center bg-light text-muted mb-3" style="width: 70px; height: 70px; font-size: 2rem;">
+                            <i class="fa-solid fa-file-circle-xmark"></i>
+                        </div>
+                        <h6 class="fw-bold text-dark">No Resume Uploaded</h6>
+                        <p class="text-muted small mb-0">Please upload a PDF resume so recruiters can review your credentials.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Right: Upload / Replace Form Card -->
+            <div class="col-lg-6">
+                <div class="card card-custom p-4 h-100">
+                    <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
+                        <i class="fa-solid fa-cloud-arrow-up text-primary me-2"></i> {% if resume %}Replace Resume{% else %}Upload New Resume{% endif %}
+                    </h5>
+
+                    <form id="resume-upload-form" method="POST" action="{{ url_for('upload_resume') }}" enctype="multipart/form-data">
+                        <div class="mb-4">
+                            <label for="resume_file" class="form-label fw-semibold small">Select PDF File *</label>
+                            <input class="form-control" type="file" id="resume_file" name="resume_file" accept=".pdf,application/pdf" required>
+                            <div class="form-text text-muted">
+                                <i class="fa-solid fa-circle-info me-1"></i> Only <strong>PDF (.pdf)</strong> files are allowed. Maximum file size: 16 MB.
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-light rounded border mb-4">
+                            <h6 class="fw-bold small text-dark mb-2"><i class="fa-solid fa-check-double text-success me-1"></i> Resume Upload Guidelines:</h6>
+                            <ul class="text-muted small mb-0 ps-3">
+                                <li>Ensure your contact details and register number are up to date.</li>
+                                <li>Keep the file under 1-2 pages in clean standard ATS format.</li>
+                                <li>Ensure hyperlinks (GitHub, LinkedIn) are active and clickable.</li>
+                            </ul>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2">
+                            <i class="fa-solid fa-upload me-1"></i> {% if resume %}Replace Resume File{% else %}Upload PDF Resume{% endif %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Application Management - Placement Officer{% endblock %}
+
+{% block content %}
+<div class="app-wrapper">
+    {% include "admin_sidebar.html" %}
+
+    <div class="main-content">
+        <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+            <div>
+                <h3 class="fw-bold text-dark mb-1">Candidate Applications Tracker</h3>
+                <p class="text-muted small mb-0">Review student applications, inspect resumes, and update recruitment milestone stages.</p>
+            </div>
+            <a href="{{ url_for('admin_jobs') }}" class="btn btn-outline-primary btn-sm">
+                <i class="fa-solid fa-briefcase me-1"></i> Manage Drives
+            </a>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="card card-custom p-3 mb-4">
+            <form method="GET" action="{{ url_for('admin_applications') }}" class="row g-2 align-items-center">
+                <div class="col-md-5">
+                    <label class="form-label small fw-bold text-muted mb-1">Filter by Job Drive</label>
+                    <select class="form-select" name="job_id">
+                        <option value="">All Job Drives</option>
+                        {% for j in jobs %}
+                            <option value="{{ j.id }}" {% if job_filter == j.id %}selected{% endif %}>
+                                {{ j.title }} ({{ j.company }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-bold text-muted mb-1">Filter by Application Status</label>
+                    <select class="form-select" name="status">
+                        <option value="">All Statuses</option>
+                        <option value="Applied" {% if status_filter == 'Applied' %}selected{% endif %}>Applied</option>
+                        <option value="Shortlisted" {% if status_filter == 'Shortlisted' %}selected{% endif %}>Shortlisted</option>
+                        <option value="Interview" {% if status_filter == 'Interview' %}selected{% endif %}>Interview</option>
+                        <option value="Selected" {% if status_filter == 'Selected' %}selected{% endif %}>Selected</option>
+                        <option value="Rejected" {% if status_filter == 'Rejected' %}selected{% endif %}>Rejected</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-primary flex-fill">Apply Filters</button>
+                    {% if status_filter or job_filter %}
+                        <a href="{{ url_for('admin_applications') }}" class="btn btn-light border" title="Reset Filters"><i class="fa-solid fa-xmark"></i></a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+
+        <!-- Applications Table Card -->
+        <div class="card card-custom">
+            <div class="card-body-custom p-0">
+                <div class="table-responsive">
+                    <table class="table table-custom mb-0">
+                        <thead>
+                            <tr>
+                                <th>Candidate</th>
+                                <th>Drive & Company</th>
+                                <th>CGPA & Dept</th>
+                                <th>Applied Date</th>
+                                <th>Current Status</th>
+                                <th>Resume</th>
+                                <th>Update Stage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if applications %}
+                                {% for app in applications %}
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold text-dark">{{ app.student_name }}</div>
+                                        <small class="text-muted">{{ app.student_email }}</small>
+                                        {% if app.register_no %}
+                                            <div class="small text-secondary fw-semibold">Reg: {{ app.register_no }}</div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="fw-semibold text-dark">{{ app.job_title }}</div>
+                                        <div class="small text-primary fw-semibold">{{ app.company }}</div>
+                                    </td>
+                                    <td>
+                                        <div class="small text-dark">{{ app.department or 'N/A' }}</div>
+                                        {% if app.cgpa %}
+                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle">CGPA: {{ app.cgpa }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">{{ app.applied_at[:10] }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge-status {{ app.status|lower }}">
+                                            {{ app.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if app.resume_file %}
+                                            <a href="{{ url_for('view_resume_file', filename=app.resume_file) }}" target="_blank" class="btn btn-outline-danger btn-sm py-1 px-2" style="font-size: 0.8rem;">
+                                                <i class="fa-solid fa-file-pdf me-1"></i> PDF
+                                            </a>
+                                        {% else %}
+                                            <span class="text-muted small">No file</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <!-- Inline Status Update Form -->
+                                        <form method="POST" action="{{ url_for('admin_update_application_status', app_id=app.id) }}" class="d-flex align-items-center gap-1">
+                                            <select name="status" class="form-select form-select-sm py-1" style="min-width: 130px; font-size: 0.82rem;" onchange="this.form.submit()">
+                                                <option value="Applied" {% if app.status == 'Applied' %}selected{% endif %}>Applied</option>
+                                                <option value="Shortlisted" {% if app.status == 'Shortlisted' %}selected{% endif %}>Shortlisted</option>
+                                                <option value="Interview" {% if app.status == 'Interview' %}selected{% endif %}>Interview</option>
+                                                <option value="Selected" {% if app.status == 'Selected' %}selected{% endif %}>Selected (Placed)</option>
+                                                <option value="Rejected" {% if app.status == 'Rejected' %}selected{% endif %}>Rejected</option>
+                                            </select>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-5 text-muted">
+                                        No applications found matching the selected filters.
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

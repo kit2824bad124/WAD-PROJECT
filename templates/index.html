@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+
+{% block title %}Student Skill & Placement Tracker - Build Skills, Track Growth, Get Placed{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section text-center">
+    <div class="container">
+        <div class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-semibold mb-3">
+            <i class="fa-solid fa-sparkles me-1"></i> Smart Campus Career & Placement Ecosystem
+        </div>
+        <h1 class="hero-title">
+            Build Your Skills. <br class="d-none d-md-block">
+            <span class="hero-gradient-text">Track Your Growth.</span> Get Placed.
+        </h1>
+        <p class="hero-subtitle">
+            An all-in-one placement portal designed for students to showcase verified skills, track certifications and projects, analyze role readiness with skill gap intelligence, and secure dream campus offers.
+        </p>
+
+        <!-- Quick CTAs -->
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+            <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg px-4 shadow">
+                <i class="fa-solid fa-user-graduate me-2"></i> Student Login
+            </a>
+            <a href="{{ url_for('register') }}" class="btn btn-outline-primary btn-lg px-4">
+                <i class="fa-solid fa-user-plus me-2"></i> Student Register
+            </a>
+            <a href="{{ url_for('login') }}" class="btn btn-light btn-lg px-4 border">
+                <i class="fa-solid fa-shield-halved me-2 text-primary"></i> Admin / Officer Login
+            </a>
+        </div>
+
+        <!-- Live Metrics Bar -->
+        <div class="row g-3 justify-content-center mt-5">
+            <div class="col-6 col-md-3">
+                <div class="stat-card p-3">
+                    <div class="text-start">
+                        <div class="stat-label">Registered Students</div>
+                        <div class="stat-number text-primary">{{ total_students }}</div>
+                    </div>
+                    <div class="stat-icon primary ms-2">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card p-3">
+                    <div class="text-start">
+                        <div class="stat-label">Active Drives</div>
+                        <div class="stat-number text-secondary">{{ total_jobs }}</div>
+                    </div>
+                    <div class="stat-icon secondary ms-2">
+                        <i class="fa-solid fa-building"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="text-start stat-card p-3">
+                    <div>
+                        <div class="stat-label">Applications</div>
+                        <div class="stat-number text-info">{{ total_applications }}</div>
+                    </div>
+                    <div class="stat-icon info ms-2">
+                        <i class="fa-solid fa-file-signature"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="text-start stat-card p-3">
+                    <div>
+                        <div class="stat-label">Placed Students</div>
+                        <div class="stat-number text-success">{{ total_placed }}</div>
+                    </div>
+                    <div class="stat-icon success ms-2">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Why Use This Platform? Section -->
+<section class="py-5 bg-white border-top border-bottom">
+    <div class="container py-3">
+        <div class="text-center max-w-700 mx-auto mb-5">
+            <span class="text-primary fw-bold text-uppercase small letter-spacing-1">Why Choose Us</span>
+            <h2 class="fw-bold mt-1 text-dark">Engineered for Modern Campus Recruitment</h2>
+            <p class="text-muted">Bridge the gap between academic preparation and corporate expectations with intelligent skill matching.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <div class="feature-icon-wrapper">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Automated Skill Gap Analysis</h5>
+                    <p class="text-muted mb-0">Directly compare your technical proficiencies with job requirements. Know exactly what skills to improve before submitting an application.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <div class="feature-icon-wrapper">
+                        <i class="fa-solid fa-id-card-clip"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Comprehensive Digital Portfolio</h5>
+                    <p class="text-muted mb-0">Showcase technical skills, verified certifications, GitHub project repositories, and a verified PDF resume all in one place.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <div class="feature-icon-wrapper">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Real-Time Application Tracking</h5>
+                    <p class="text-muted mb-0">Transparent tracking through Applied, Shortlisted, Interview, and Selected recruitment milestones without uncertainty.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Core Features Grid -->
+<section class="py-5">
+    <div class="container py-3">
+        <div class="text-center max-w-700 mx-auto mb-5">
+            <span class="text-secondary fw-bold text-uppercase small">Platform Capabilities</span>
+            <h2 class="fw-bold mt-1 text-dark">Features Tailored for Students & Admins</h2>
+            <p class="text-muted">Everything needed for transparent, efficient campus placements.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="card card-custom h-100 p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="badge bg-primary-subtle text-primary p-2 rounded-3 me-3 fs-5"><i class="fa-solid fa-code"></i></span>
+                        <h5 class="fw-bold mb-0">Proficiency-Based Skills</h5>
+                    </div>
+                    <p class="text-muted mb-0">Tag skills with Beginner, Intermediate, or Advanced levels so recruiters know your depth of mastery.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card card-custom h-100 p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="badge bg-success-subtle text-success p-2 rounded-3 me-3 fs-5"><i class="fa-solid fa-award"></i></span>
+                        <h5 class="fw-bold mb-0">Certifications Tracker</h5>
+                    </div>
+                    <p class="text-muted mb-0">Organize external courses from AWS, Oracle, Meta, Coursera with credentials and verification links.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card card-custom h-100 p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="badge bg-info-subtle text-info p-2 rounded-3 me-3 fs-5"><i class="fa-solid fa-laptop-code"></i></span>
+                        <h5 class="fw-bold mb-0">Project Repository Showcase</h5>
+                    </div>
+                    <p class="text-muted mb-0">Highlight capstone and hackathon builds with technologies used, live previews, and GitHub repository links.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card card-custom h-100 p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="badge bg-warning-subtle text-warning p-2 rounded-3 me-3 fs-5"><i class="fa-solid fa-file-pdf"></i></span>
+                        <h5 class="fw-bold mb-0">Resume Management</h5>
+                    </div>
+                    <p class="text-muted mb-0">Upload, view, replace, or update your standardized PDF resume with secure server-side validation.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card card-custom h-100 p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="badge bg-danger-subtle text-danger p-2 rounded-3 me-3 fs-5"><i class="fa-solid fa-briefcase"></i></span>
+                        <h5 class="fw-bold mb-0">Drive Opportunities</h5>
+                    </div>
+                    <p class="text-muted mb-0">Filter by role, package/stipend, and deadline. 1-click apply with duplicate application safeguards.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card card-custom h-100 p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="badge bg-primary-subtle text-secondary p-2 rounded-3 me-3 fs-5"><i class="fa-solid fa-chart-pie"></i></span>
+                        <h5 class="fw-bold mb-0">Admin Placement BI</h5>
+                    </div>
+                    <p class="text-muted mb-0">Interactive visual charts for placement officers to track recruitment trends and departmental success.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-5 bg-white border-top border-bottom">
+    <div class="container py-3">
+        <div class="text-center max-w-700 mx-auto mb-5">
+            <span class="text-primary fw-bold text-uppercase small">Simple Workflow</span>
+            <h2 class="fw-bold mt-1 text-dark">How It Works</h2>
+            <p class="text-muted">Four simple steps to fast-track your campus placement journey.</p>
+        </div>
+
+        <div class="row g-4 text-center">
+            <div class="col-md-3">
+                <div class="p-3">
+                    <div class="badge rounded-pill bg-primary px-3 py-2 fs-6 mb-3">Step 1</div>
+                    <h5 class="fw-bold">Create Profile</h5>
+                    <p class="text-muted small">Register with your college roll number and build a comprehensive academic profile.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-3">
+                    <div class="badge rounded-pill bg-secondary px-3 py-2 fs-6 mb-3">Step 2</div>
+                    <h5 class="fw-bold">Add Skills & Projects</h5>
+                    <p class="text-muted small">List technical competencies, proficiency levels, certifications, and GitHub projects.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-3">
+                    <div class="badge rounded-pill bg-warning text-dark px-3 py-2 fs-6 mb-3">Step 3</div>
+                    <h5 class="fw-bold">Analyze Skill Gap</h5>
+                    <p class="text-muted small">Evaluate your profile against job requirements to see your match percentage and suggestions.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-3">
+                    <div class="badge rounded-pill bg-success px-3 py-2 fs-6 mb-3">Step 4</div>
+                    <h5 class="fw-bold">Apply & Get Placed</h5>
+                    <p class="text-muted small">Submit applications, attend campus interviews, and monitor your placement offer status.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recent Job Openings Preview -->
+<section class="py-5">
+    <div class="container py-3">
+        <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+            <div>
+                <span class="text-primary fw-bold text-uppercase small">Current Opportunities</span>
+                <h3 class="fw-bold text-dark mb-0">Featured Campus Drives</h3>
+            </div>
+            <a href="{{ url_for('jobs') }}" class="btn btn-outline-primary btn-sm px-3">
+                View All Drives <i class="fa-solid fa-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            {% for job in recent_jobs %}
+            <div class="col-md-4">
+                <div class="card card-custom h-100 p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge bg-light text-dark border">{{ job.job_type }}</span>
+                        <span class="text-muted small"><i class="fa-regular fa-clock me-1"></i> Deadline: {{ job.deadline }}</span>
+                    </div>
+                    <h5 class="fw-bold mb-1 text-dark">{{ job.title }}</h5>
+                    <p class="text-primary fw-semibold mb-2"><i class="fa-solid fa-building me-1"></i> {{ job.company }}</p>
+                    <p class="text-muted small mb-3"><i class="fa-solid fa-location-dot me-1"></i> {{ job.location }} &bull; <i class="fa-solid fa-money-bill-wave me-1"></i> {{ job.salary }}</p>
+                    <div class="mb-3">
+                        <small class="text-muted d-block mb-1 fw-semibold">Required Skills:</small>
+                        {% for skill in job.required_skills.split(',')[:4] %}
+                            <span class="skill-tag">{{ skill.strip() }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="mt-auto pt-2 border-top">
+                        <a href="{{ url_for('login') }}" class="btn btn-primary btn-sm w-100">
+                            Apply / View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile - Student Skill & Placement Tracker{% endblock %}
+
+{% block content %}
+<div class="app-wrapper">
+    {% include "student_sidebar.html" %}
+
+    <div class="main-content">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h3 class="fw-bold text-dark mb-1">My Profile</h3>
+                <p class="text-muted small mb-0">Update your academic credentials, contact details, and placement bio.</p>
+            </div>
+        </div>
+
+        <form method="POST" action="{{ url_for('profile') }}" enctype="multipart/form-data">
+            <div class="row g-4">
+                <!-- Left Column: Photo & Summary Card -->
+                <div class="col-lg-4">
+                    <div class="card card-custom p-4 text-center">
+                        <div class="position-relative d-inline-block mx-auto mb-3">
+                            {% if profile and profile.profile_photo and profile.profile_photo != 'default_avatar.png' %}
+                                <img src="{{ url_for('view_photo_file', filename=profile.profile_photo) }}" alt="Profile Photo" class="avatar-profile shadow">
+                            {% else %}
+                                <div class="avatar-profile mx-auto d-flex align-items-center justify-content-center bg-primary-subtle text-primary shadow" style="font-size: 3rem;">
+                                    <i class="fa-solid fa-user-graduate"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <h5 class="fw-bold text-dark mb-1">{{ user.name }}</h5>
+                        <p class="text-muted small mb-2">{{ profile.department or 'Department Unspecified' }}</p>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 mb-3">
+                            {{ profile.year or 'Year not specified' }}
+                        </span>
+
+                        <div class="text-start border-top pt-3">
+                            <label for="profile_photo" class="form-label fw-semibold small">Update Profile Photo</label>
+                            <input class="form-control form-control-sm" type="file" id="profile_photo" name="profile_photo" accept="image/*">
+                            <small class="text-muted" style="font-size: 0.75rem;">Supported formats: PNG, JPG, JPEG, WEBP.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Edit Profile Fields -->
+                <div class="col-lg-8">
+                    <div class="card card-custom p-4">
+                        <h5 class="fw-bold text-dark mb-4 border-bottom pb-2">Academic & Personal Details</h5>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="name" class="form-label fw-semibold small">Full Name *</label>
+                                <input type="text" class="form-control" id="name" name="name" value="{{ user.name }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="register_no" class="form-label fw-semibold small">Register / Roll Number</label>
+                                <input type="text" class="form-control" id="register_no" name="register_no" value="{{ profile.register_no if profile else '' }}" placeholder="e.g. 717822P101">
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="email" class="form-label fw-semibold small">Email Address</label>
+                                <input type="email" class="form-control bg-light" id="email" value="{{ user.email }}" readonly disabled>
+                                <small class="text-muted" style="font-size: 0.75rem;">Contact administrator to change registered email.</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="phone" class="form-label fw-semibold small">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" value="{{ profile.phone if profile else '' }}" placeholder="+91 98765 43210">
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="department" class="form-label fw-semibold small">Department / Major</label>
+                                <select class="form-select" id="department" name="department">
+                                    <option value="">Select Department...</option>
+                                    <option value="Computer Science and Engineering" {% if profile and profile.department == 'Computer Science and Engineering' %}selected{% endif %}>Computer Science and Engineering</option>
+                                    <option value="Information Technology" {% if profile and profile.department == 'Information Technology' %}selected{% endif %}>Information Technology</option>
+                                    <option value="Electronics and Communication" {% if profile and profile.department == 'Electronics and Communication' %}selected{% endif %}>Electronics and Communication</option>
+                                    <option value="Electrical and Electronics" {% if profile and profile.department == 'Electrical and Electronics' %}selected{% endif %}>Electrical and Electronics</option>
+                                    <option value="Mechanical Engineering" {% if profile and profile.department == 'Mechanical Engineering' %}selected{% endif %}>Mechanical Engineering</option>
+                                    <option value="Civil Engineering" {% if profile and profile.department == 'Civil Engineering' %}selected{% endif %}>Civil Engineering</option>
+                                    <option value="Artificial Intelligence & Data Science" {% if profile and profile.department == 'Artificial Intelligence & Data Science' %}selected{% endif %}>Artificial Intelligence & Data Science</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="year" class="form-label fw-semibold small">Year of Study</label>
+                                <select class="form-select" id="year" name="year">
+                                    <option value="">Select Year...</option>
+                                    <option value="1st Year" {% if profile and profile.year == '1st Year' %}selected{% endif %}>1st Year</option>
+                                    <option value="2nd Year" {% if profile and profile.year == '2nd Year' %}selected{% endif %}>2nd Year</option>
+                                    <option value="3rd Year" {% if profile and profile.year == '3rd Year' %}selected{% endif %}>3rd Year</option>
+                                    <option value="4th Year" {% if profile and profile.year == '4th Year' %}selected{% endif %}>4th Year</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="cgpa" class="form-label fw-semibold small">Current CGPA</label>
+                                <input type="number" step="0.01" min="0" max="10" class="form-control" id="cgpa" name="cgpa" value="{{ profile.cgpa if profile and profile.cgpa is not none else '' }}" placeholder="8.50">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="location" class="form-label fw-semibold small">Current Location / City</label>
+                            <input type="text" class="form-control" id="location" name="location" value="{{ profile.location if profile else '' }}" placeholder="e.g. Chennai, Tamil Nadu">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="about_me" class="form-label fw-semibold small">About Me / Placement Bio</label>
+                            <textarea class="form-control" id="about_me" name="about_me" rows="4" placeholder="Briefly describe your career objectives, technical passions, and key strengths...">{{ profile.about_me if profile else '' }}</textarea>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="fa-solid fa-floppy-disk me-1"></i> Save Profile Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
